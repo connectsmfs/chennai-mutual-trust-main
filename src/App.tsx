@@ -27,7 +27,6 @@ const App = () => (
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/client-login" element={<ClientLoginPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

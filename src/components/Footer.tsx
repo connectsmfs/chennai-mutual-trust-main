@@ -54,12 +54,24 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-background/20 pt-8 text-center text-background/70 text-sm">
-          <p>© {currentYear} Shree Mutual Fund Services. All rights reserved.</p>
-          <p className="mt-2">
-            Designed with care for your mutual fund journey
-          </p>
-        </div>
+      <div className="border-t border-background/20 pt-8 text-center text-background/70 text-sm">
+  <p>© {currentYear} Shree Mutual Fund Services. All rights reserved.</p>
+
+  {/* Add Privacy Policy link here */}
+  <p className="mt-2">
+    <a 
+      href="/privacy-policy" 
+      className="text-orange-500 hover:underline"
+    >
+      Privacy Policy
+    </a>
+  </p>
+
+  <p className="mt-2">
+    Designed with care for your mutual fund journey
+  </p>
+</div>
+
       </div>
     </footer>
   );

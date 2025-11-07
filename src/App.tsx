@@ -12,11 +12,6 @@ import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
 import ClientLoginPage from "./pages/ClientLoginPage";
 
-<Route path="/client-login" element={<ClientLoginPage />} />
-// Inside <Routes>:
-<Route path="/privacy-policy" element={<PrivacyPolicy />} />
-
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -31,6 +26,7 @@ const App = () => (
           <Route path="/calculators" element={<CalculatorsPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/client-login" element={<ClientLoginPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

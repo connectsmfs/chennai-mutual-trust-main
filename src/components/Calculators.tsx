@@ -59,6 +59,11 @@ const Calculators = () => {
   const [stepUpType, setStepUpType] = useState<"percentage" | "value">("percentage");
   const [stepUpFrequency, setStepUpFrequency] = useState<"monthly" | "quarterly" | "half-yearly" | "annually">("annually");
 
+  // SWP Calculator state
+  const [swpCorpus, setSwpCorpus] = useState(1000000);
+  const [swpWithdrawal, setSwpWithdrawal] = useState(10000);
+  const [swpRate, setSwpRate] = useState(12);
+  const [swpYears, setSwpYears] = useState(15);
 
   const calculateSIP = () => {
     const monthlyRate = sipRate / 12 / 100;
@@ -181,6 +186,33 @@ const Calculators = () => {
     return { futureValue, invested: totalInvested, returns };
   };
 
+  const calculateSWP = () => {
+    const monthlyRate = swpRate / 12 / 100;
+    let remainingCorpus = swpCorpus;
+    let totalWithdrawn = 0;
+    const months = swpYears * 12;
+
+    for (let month = 1; month <= months; month++) {
+      // Add returns to remaining corpus
+      remainingCorpus = remainingCorpus * (1 + monthlyRate);
+      // Withdraw monthly amount
+      remainingCorpus -= swpWithdrawal;
+      totalWithdrawn += swpWithdrawal;
+      
+      // If corpus depletes, break
+      if (remainingCorpus <= 0) {
+        remainingCorpus = 0;
+        break;
+      }
+    }
+
+    return { 
+      remainingCorpus: Math.max(0, remainingCorpus), 
+      totalWithdrawn, 
+      initialCorpus: swpCorpus 
+    };
+  };
+
   const sipResult = calculateSIP();
   const lumpResult = calculateLumpsum();
   const goalResult = calculateGoal();
@@ -189,6 +221,7 @@ const Calculators = () => {
   const humanLifeValueResult = calculateHumanLifeValue();
   const marriagePlanningResult = calculateMarriagePlanning();
   const stepUpSipResult = calculateStepUpSIP();
+  const swpResult = calculateSWP();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -213,7 +246,7 @@ const Calculators = () => {
 
         <div className="max-w-5xl mx-auto">
           <Tabs defaultValue="sip" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-8 h-auto p-2 bg-card rounded-2xl shadow-lg">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 h-auto p-2 bg-card rounded-2xl shadow-lg gap-2">
               <TabsTrigger
                 value="sip"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 text-sm font-semibold transition-all"
@@ -263,12 +296,19 @@ const Calculators = () => {
                 <Diamond className="w-4 h-4 mr-1 lg:mr-2" />
                 Marriage
               </TabsTrigger>
-                          <TabsTrigger
+              <TabsTrigger
                 value="stepup-sip"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 text-sm font-semibold transition-all"
               >
                 <TrendingUp className="w-4 h-4 mr-1 lg:mr-2" />
                 Step-up SIP
+              </TabsTrigger>
+              <TabsTrigger
+                value="swp"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 text-sm font-semibold transition-all"
+              >
+                <TrendingUp className="w-4 h-4 mr-1 lg:mr-2" />
+                SWP
               </TabsTrigger>
             </TabsList>
 
@@ -341,7 +381,7 @@ const Calculators = () => {
                               paddingAngle={2}
                               dataKey="value"
                             >
-                              <Cell fill="hsl(var(--primary) / 0.7)" />
+                              <Cell fill="hsl(var(--primary) / 0.3)" />
                               <Cell fill="hsl(var(--primary))" />
                             </Pie>
                             <Legend 
@@ -442,7 +482,7 @@ const Calculators = () => {
                               paddingAngle={2}
                               dataKey="value"
                             >
-                              <Cell fill="hsl(var(--primary) / 0.7)" />
+                              <Cell fill="hsl(var(--primary) / 0.3)" />
                               <Cell fill="hsl(var(--primary))" />
                             </Pie>
                             <Legend 
@@ -1056,7 +1096,7 @@ const Calculators = () => {
                               paddingAngle={2}
                               dataKey="value"
                             >
-                              <Cell fill="hsl(var(--primary) / 0.7)" />
+                              <Cell fill="hsl(var(--primary) / 0.3)" />
                               <Cell fill="hsl(var(--primary))" />
                             </Pie>
                             <Legend 
@@ -1088,6 +1128,118 @@ const Calculators = () => {
               </Card>
             </TabsContent>
 
+            {/* SWP Calculator */}
+            <TabsContent value="swp" className="mt-8">
+              <Card className="border-0 shadow-2xl rounded-3xl overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-accent to-primary text-primary-foreground p-8">
+                  <CardTitle className="text-3xl">SWP Calculator</CardTitle>
+                  <CardDescription className="text-primary-foreground/90 text-base">
+                    Calculate sustainable withdrawals from your investment corpus
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="swpCorpus" className="text-base font-semibold mb-3 block">
+                          Total Investment Corpus (₹)
+                        </Label>
+                        <Input
+                          id="swpCorpus"
+                          type="number"
+                          value={swpCorpus}
+                          onChange={(e) => setSwpCorpus(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="swpWithdrawal" className="text-base font-semibold mb-3 block">
+                          Monthly Withdrawal Amount (₹)
+                        </Label>
+                        <Input
+                          id="swpWithdrawal"
+                          type="number"
+                          value={swpWithdrawal}
+                          onChange={(e) => setSwpWithdrawal(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="swpRate" className="text-base font-semibold mb-3 block">
+                          Expected Annual Return (%)
+                        </Label>
+                        <Input
+                          id="swpRate"
+                          type="number"
+                          value={swpRate}
+                          onChange={(e) => setSwpRate(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="swpYears" className="text-base font-semibold mb-3 block">
+                          Withdrawal Period (Years)
+                        </Label>
+                        <Input
+                          id="swpYears"
+                          type="number"
+                          value={swpYears}
+                          onChange={(e) => setSwpYears(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-accent/5 to-primary/5 rounded-2xl p-8 space-y-6">
+                      <h3 className="text-2xl font-bold mb-6">Withdrawal Summary</h3>
+                      
+                      {/* Donut Chart */}
+                      <div className="h-64 mb-6">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={[
+                                { name: "Withdrawn", value: swpResult.totalWithdrawn },
+                                { name: "Remaining", value: swpResult.remainingCorpus }
+                              ]}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={90}
+                              paddingAngle={2}
+                              dataKey="value"
+                            >
+                              <Cell fill="hsl(var(--primary) / 0.3)" />
+                              <Cell fill="hsl(var(--primary))" />
+                            </Pie>
+                            <Legend 
+                              verticalAlign="top" 
+                              height={36}
+                              formatter={(value) => <span className="text-sm">{value}</span>}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Initial Corpus</span>
+                          <span className="text-xl font-bold">{formatCurrency(swpResult.initialCorpus)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Total Withdrawn</span>
+                          <span className="text-xl font-bold text-green-600">{formatCurrency(swpResult.totalWithdrawn)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-2">
+                          <span className="text-lg font-semibold">Remaining Corpus</span>
+                          <span className="text-3xl font-bold text-primary">{formatCurrency(swpResult.remainingCorpus)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
         </div>
       </div>

@@ -11,14 +11,23 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <img src={shreeLogo} alt="Shree Mutual Fund Services" className="h-12 w-14 brightness-0 invert" />
+              <img
+                src={shreeLogo}
+                alt="Shree Mutual Fund Services"
+                className="h-12 w-14 brightness-0 invert"
+              />
               <div>
-                <h3 className="text-xl font-bold">Shree Mutual Fund Services</h3>
-                <p className="text-sm text-background/70">Chennai's Most Trusted</p>
+                <h3 className="text-xl font-bold">
+                  Shree Mutual Fund Services
+                </h3>
+                <p className="text-sm text-background/70">
+                  Chennai's Most Trusted
+                </p>
               </div>
             </div>
             <p className="text-background/70 text-sm leading-relaxed">
-              Your journey to smarter investing starts with trust and transparency. Building financial futures since 2004.
+              Your journey to smarter investing starts with trust and transparency.
+              Building financial futures since 2004.
             </p>
           </div>
 
@@ -26,17 +35,41 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-bold mb-4">Contact Us</h4>
             <div className="space-y-3 text-background/70 text-sm">
+              {/* 📍 Address with Google Maps Link */}
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <span>4th Floor, A14, Thiru Vi Ka Industrial Estate,<br />Guindy, Chennai - 600032, Tamil Nadu</span>
+                <a
+                  href="https://www.google.com/maps?q=Shree+Mutual+Fund+Services,+Thiru+Vi+Ka+Industrial+Estate,+Guindy,+Chennai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-orange-400 transition-colors"
+                >
+                  4th Floor, A14, Thiru Vi Ka Industrial Estate,
+                  <br />
+                  Guindy, Chennai - 600032, Tamil Nadu
+                </a>
               </div>
+
+              {/* 📞 Clickable Phone Number */}
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 flex-shrink-0" />
-                <span>+91 98848 91111</span>
+                <a
+                  href="tel:+919884891111"
+                  className="hover:text-orange-400 transition-colors"
+                >
+                  +91 98848 91111
+                </a>
               </div>
+
+              {/* 📧 Clickable Email */}
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 flex-shrink-0" />
-                <span>connect@shreemfs.com</span>
+                <a
+                  href="mailto:connect@shreemfs.com"
+                  className="hover:text-orange-400 transition-colors"
+                >
+                  connect@shreemfs.com
+                </a>
               </div>
             </div>
           </div>
@@ -45,33 +78,39 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-bold mb-4">Compliance</h4>
             <div className="space-y-2 text-background/70 text-sm">
-              <p> Shree Mutual Fund Services is an AMFI Registered Mutual Fund Distributor</p>
-              <p>ARN: 174093 </p>
+              <p>
+                Shree Mutual Fund Services is an AMFI Registered Mutual Fund
+                Distributor
+              </p>
+              <p>ARN: 174093</p>
               <p className="text-xs pt-4">
-                Mutual Fund investments are subject to market risks. Please read all scheme related documents carefully before investing. Past performance is not indicative of future returns.
+                Mutual Fund investments are subject to market risks. Please read
+                all scheme related documents carefully before investing. Past
+                performance is not indicative of future returns.
               </p>
             </div>
           </div>
         </div>
 
-      <div className="border-t border-background/20 pt-8 text-center text-background/70 text-sm">
-  <p>© {currentYear} Shree Mutual Fund Services. All rights reserved.</p>
+        {/* Footer Bottom */}
+        <div className="border-t border-background/20 pt-8 text-center text-background/70 text-sm">
+          <p>
+            © {currentYear} Shree Mutual Fund Services. All rights reserved.
+          </p>
 
-  {/* Add Privacy Policy link here */}
-  <p className="mt-2">
-    <a 
-      href="/privacy-policy" 
-      className="text-orange-500 hover:underline"
-    >
-      Privacy Policy
-    </a>
-  </p>
+          <p className="mt-2">
+            <a
+              href="/privacy-policy"
+              className="text-orange-500 hover:underline"
+            >
+              Privacy Policy
+            </a>
+          </p>
 
-  <p className="mt-2">
-    Designed with care for your mutual fund journey
-  </p>
-</div>
-
+          <p className="mt-2">
+            Designed with care for your mutual fund journey
+          </p>
+        </div>
       </div>
     </footer>
   );

@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calculator, TrendingUp, Target, GraduationCap, Armchair, Heart, Diamond } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 
+
+
 const Calculators = () => {
   // SIP Calculator State
   const [sipAmount, setSipAmount] = useState(5000);

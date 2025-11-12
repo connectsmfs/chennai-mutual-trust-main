@@ -9,17 +9,17 @@ const Testimonials = () => {
 
   const testimonials = [
     {
-      name: "Rajesh Kumar",
-      location: "T. Nagar, Chennai",
+      name: "Vignesh Krishnan",
+      location: "Chennai",
       rating: 5,
-      text: "Shree Mutual Fund Services transformed my understanding of systematic investments. Their personalized approach helped me build a substantial corpus for my daughter's education. The team is professional, transparent, and genuinely cares about client success.",
+      text: "My valuable feedback it is one of the best service to go on which will be more helpful for.the future the guidence from sathyan.G from Chennai has provided a good solution for my life and for my family sathyan.G has given me one of the best option for my upcoming life.",
       investment: "SIP Investor since 2018",
     },
     {
       name: "Priya Venkatesh",
       location: "Adyar, Chennai",
       rating: 5,
-      text: "I was skeptical about mutual funds until I met the Shree team. They patiently explained every detail and created a customized plan for my retirement. Five years later, I'm amazed at the growth. Best financial decision I ever made!",
+      text: "Best in class Financial Advisors in South India, expertised in advising about investment in major asset classes and insurance solutions both life and general. Provide state of art Financial services to individuals and corporates. Specialists in advising people in Medical fraternity. More than 300 crores of assets under management with 2500 clients all-over south India.",
       investment: "Retirement Planning Client",
     },
     {
@@ -58,24 +58,24 @@ const Testimonials = () => {
 
   const trustpilotReviews = [
     {
-      name: "Venkatesh R.",
+      name: "Mohan Krishnan",
       rating: 5,
       date: "2 days ago",
-      text: "Exceptional service! The team at Shree Mutual Fund Services helped me understand mutual funds from scratch. Their personalized approach and transparency make them stand out.",
+      text: "Excellent support by Relationship Manager, Ms Sigappi. She guided me through the process patiently and politely.",
       verified: true,
     },
     {
-      name: "Meena S.",
+      name: "Ramu Sakthivel.",
       rating: 5,
       date: "1 week ago",
-      text: "Best mutual fund distributor in Chennai! Been with them for 5 years and my portfolio has grown significantly. Highly recommend for anyone serious about investing.",
+      text: "Hi, i am really happy to be a client of Shree Consultancy. Mr.Vignesh has made sure any queries to be answered and get me the financial services whatever I have requested.I would like to continue the relationship with your company. Thanks for the efforts you guys taking for all the clients request..",
       verified: true,
     },
     {
-      name: "Karthik P.",
+      name: "Monisha Jayakuma.",
       rating: 5,
-      date: "2 weeks ago",
-      text: "Professional, knowledgeable, and always available. They don't just manage investments, they educate you about making smart financial decisions.",
+      date: "1 weeks ago",
+      text: "Very patiently explained the things and cleared all our confusion regarding the insurance and guided us to pick the correct one based on our requirements",
       verified: true,
     },
   ];

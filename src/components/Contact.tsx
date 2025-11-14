@@ -12,6 +12,7 @@ const Contact = () => {
     name: "",
     email: "",
     phone: "",
+    product: "", // ✅ added field
     message: "",
   });
 
@@ -26,19 +27,19 @@ const Contact = () => {
       });
 
       if (response.ok) {
-        toast.success("Thank you! We’ve received your message.");
-        setFormData({ name: "", email: "", phone: "", message: "" });
+        toast.success("✅ Thank you! We’ve received your message.");
+        setFormData({ name: "", email: "", phone: "", product: "", message: "" });
       } else {
-        toast.error("Something went wrong. Please try again.");
+        toast.error("❌ Something went wrong. Please try again.");
       }
     } catch (error) {
-      toast.error("Failed to send message. Try again later.");
+      toast.error("⚠️ Failed to send message. Try again later.");
       console.error(error);
     }
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -54,7 +55,7 @@ const Contact = () => {
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Get In Touch</h2>
           <div className="w-24 h-1 bg-gradient-to-r from-primary to-accent mx-auto mb-6"></div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Ready to start your investment journey? Contact us today for a free consultation
+            Ready to start your investment journey? Contact us today for a free consultation.
           </p>
         </div>
 
@@ -63,6 +64,7 @@ const Contact = () => {
           {/* Contact Form */}
           <Card className="p-8 border-0 shadow-2xl rounded-3xl bg-card">
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Full Name */}
               <div>
                 <Label htmlFor="name" className="text-base font-semibold mb-2 block">
                   Full Name *
@@ -78,6 +80,7 @@ const Contact = () => {
                 />
               </div>
 
+              {/* Email */}
               <div>
                 <Label htmlFor="email" className="text-base font-semibold mb-2 block">
                   Email Address *
@@ -93,6 +96,7 @@ const Contact = () => {
                 />
               </div>
 
+              {/* Phone */}
               <div>
                 <Label htmlFor="phone" className="text-base font-semibold mb-2 block">
                   Phone Number *
@@ -108,6 +112,27 @@ const Contact = () => {
                 />
               </div>
 
+              {/* Product Dropdown */}
+              <div>
+                <Label htmlFor="product" className="text-base font-semibold mb-2 block">
+                  Product *
+                </Label>
+                <select
+                  id="product"
+                  value={formData.product}
+                  onChange={handleChange}
+                  required
+                  className="h-12 w-full border border-input bg-background rounded-xl px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <option value="">Select a product</option>
+                  <option value="Mutual Fund">Mutual Fund</option>
+                  <option value="Life Insurance">Life Insurance</option>
+                  <option value="Health Insurance">Health Insurance</option>
+                  <option value="Support">Support</option>
+                </select>
+              </div>
+
+              {/* Message */}
               <div>
                 <Label htmlFor="message" className="text-base font-semibold mb-2 block">
                   Message
@@ -122,6 +147,7 @@ const Contact = () => {
                 />
               </div>
 
+              {/* Submit Button */}
               <Button
                 type="submit"
                 size="lg"

@@ -372,12 +372,13 @@ const Calculators = () => {
           <Tabs defaultValue="sip" className="w-full">
 <TabsList
   className="
-    flex flex-wrap 
-    justify-center items-center 
+    flex flex-wrap justify-center items-center 
     gap-x-10 gap-y-6
-    w-full p-4 bg-card rounded-2xl shadow-lg
+    w-full min-h-[80px]
+    p-4 bg-card rounded-2xl shadow-lg
   "
 >
+
 
 
               <TabsTrigger

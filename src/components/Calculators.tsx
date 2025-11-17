@@ -7,8 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calculator, TrendingUp, Target, GraduationCap, Armchair, Heart, Diamond } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 
-
-
 const Calculators = () => {
   // SIP Calculator State
   const [sipAmount, setSipAmount] = useState(5000);
@@ -66,6 +64,30 @@ const Calculators = () => {
   const [swpWithdrawal, setSwpWithdrawal] = useState(10000);
   const [swpRate, setSwpRate] = useState(12);
   const [swpYears, setSwpYears] = useState(15);
+
+  // Inflation-adjusted SWP Calculator state
+  const [inflationSwpCorpus, setInflationSwpCorpus] = useState(1000000);
+  const [inflationSwpWithdrawal, setInflationSwpWithdrawal] = useState(10000);
+  const [inflationSwpRate, setInflationSwpRate] = useState(12);
+  const [inflationSwpInflation, setInflationSwpInflation] = useState(6);
+  const [inflationSwpYears, setInflationSwpYears] = useState(15);
+
+  // Delay Cost Calculator state
+  const [delayTargetAmount, setDelayTargetAmount] = useState(5000000);
+  const [delayYearsPlanned, setDelayYearsPlanned] = useState(15);
+  const [delayYearsDelayed, setDelayYearsDelayed] = useState(5);
+  const [delayRate, setDelayRate] = useState(12);
+
+  // Reverse Calculator state
+  const [reverseTargetAmount, setReverseTargetAmount] = useState(5000000);
+  const [reverseYears, setReverseYears] = useState(15);
+  const [reverseRate, setReverseRate] = useState(12);
+
+  // SIP-Lumpsum Balancer state
+  const [balancerTargetAmount, setBalancerTargetAmount] = useState(5000000);
+  const [balancerYears, setBalancerYears] = useState(10);
+  const [balancerRate, setBalancerRate] = useState(12);
+  const [balancerLumpsumAmount, setBalancerLumpsumAmount] = useState(500000);
 
   const calculateSIP = () => {
     const monthlyRate = sipRate / 12 / 100;
@@ -215,6 +237,102 @@ const Calculators = () => {
     };
   };
 
+  const calculateInflationAdjustedSWP = () => {
+    const monthlyRate = inflationSwpRate / 12 / 100;
+    let remainingCorpus = inflationSwpCorpus;
+    let currentWithdrawal = inflationSwpWithdrawal;
+    let totalWithdrawn = 0;
+    const months = inflationSwpYears * 12;
+
+    for (let month = 1; month <= months; month++) {
+      remainingCorpus = remainingCorpus * (1 + monthlyRate) - currentWithdrawal;
+      totalWithdrawn += currentWithdrawal;
+      
+      // Increase withdrawal annually to adjust for inflation
+      if (month % 12 === 0) {
+        currentWithdrawal = currentWithdrawal * (1 + inflationSwpInflation / 100);
+      }
+      
+      if (remainingCorpus < 0) {
+        remainingCorpus = 0;
+        break;
+      }
+    }
+
+    return { 
+      remainingCorpus: Math.round(Math.max(0, remainingCorpus)), 
+      totalWithdrawn: Math.round(totalWithdrawn),
+      initialCorpus: inflationSwpCorpus,
+      finalWithdrawal: Math.round(currentWithdrawal)
+    };
+  };
+
+  const calculateDelayCost = () => {
+    const monthlyRate = delayRate / 12 / 100;
+    const monthsPlanned = delayYearsPlanned * 12;
+    const monthsDelayed = (delayYearsPlanned - delayYearsDelayed) * 12;
+    
+    // Calculate required monthly SIP for original plan
+    const monthlySIPPlanned = (delayTargetAmount * monthlyRate) / (Math.pow(1 + monthlyRate, monthsPlanned) - 1);
+    
+    // Calculate required monthly SIP after delay
+    const monthlySIPDelayed = (delayTargetAmount * monthlyRate) / (Math.pow(1 + monthlyRate, monthsDelayed) - 1);
+    
+    const totalInvestedPlanned = monthlySIPPlanned * monthsPlanned;
+    const totalInvestedDelayed = monthlySIPDelayed * monthsDelayed;
+    const delayCost = monthlySIPDelayed - monthlySIPPlanned;
+    const percentageIncrease = ((monthlySIPDelayed - monthlySIPPlanned) / monthlySIPPlanned) * 100;
+
+    return {
+      monthlySIPPlanned: Math.round(monthlySIPPlanned),
+      monthlySIPDelayed: Math.round(monthlySIPDelayed),
+      delayCost: Math.round(delayCost),
+      percentageIncrease: Math.round(percentageIncrease),
+      totalInvestedPlanned: Math.round(totalInvestedPlanned),
+      totalInvestedDelayed: Math.round(totalInvestedDelayed)
+    };
+  };
+
+  const calculateReverse = () => {
+    const monthlyRate = reverseRate / 12 / 100;
+    const months = reverseYears * 12;
+    
+    // Calculate required monthly SIP to achieve target
+    const monthlySIP = (reverseTargetAmount * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
+    const totalInvestment = monthlySIP * months;
+    const returns = reverseTargetAmount - totalInvestment;
+
+    return {
+      monthlySIP: Math.round(monthlySIP),
+      totalInvestment: Math.round(totalInvestment),
+      returns: Math.round(returns),
+      targetAmount: reverseTargetAmount
+    };
+  };
+
+  const calculateSIPLumpsumBalancer = () => {
+    const monthlyRate = balancerRate / 12 / 100;
+    const months = balancerYears * 12;
+    
+    // Calculate lumpsum growth
+    const lumpsumGrowth = balancerLumpsumAmount * Math.pow(1 + balancerRate / 100, balancerYears);
+    
+    // Calculate remaining amount needed from SIP
+    const remainingAmount = balancerTargetAmount - lumpsumGrowth;
+    
+    // Calculate required monthly SIP
+    const monthlySIP = (remainingAmount * monthlyRate) / (Math.pow(1 + monthlyRate, months) - 1);
+    const totalSIPInvestment = monthlySIP * months;
+    
+    return {
+      monthlySIP: Math.round(monthlySIP),
+      lumpsumGrowth: Math.round(lumpsumGrowth),
+      totalSIPInvestment: Math.round(totalSIPInvestment),
+      totalInvestment: Math.round(balancerLumpsumAmount + totalSIPInvestment),
+      targetAmount: balancerTargetAmount
+    };
+  };
+
   const sipResult = calculateSIP();
   const lumpResult = calculateLumpsum();
   const goalResult = calculateGoal();
@@ -224,6 +342,10 @@ const Calculators = () => {
   const marriagePlanningResult = calculateMarriagePlanning();
   const stepUpSipResult = calculateStepUpSIP();
   const swpResult = calculateSWP();
+  const inflationSwpResult = calculateInflationAdjustedSWP();
+  const delayCostResult = calculateDelayCost();
+  const reverseResult = calculateReverse();
+  const balancerResult = calculateSIPLumpsumBalancer();
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
@@ -248,7 +370,7 @@ const Calculators = () => {
 
         <div className="max-w-5xl mx-auto">
           <Tabs defaultValue="sip" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 h-auto p-2 bg-card rounded-2xl shadow-lg gap-2">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 h-auto p-2 bg-card rounded-2xl shadow-lg gap-2">
               <TabsTrigger
                 value="sip"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 text-sm font-semibold transition-all"
@@ -311,6 +433,34 @@ const Calculators = () => {
               >
                 <TrendingUp className="w-4 h-4 mr-1 lg:mr-2" />
                 SWP
+              </TabsTrigger>
+              <TabsTrigger
+                value="inflation-swp"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 text-sm font-semibold transition-all"
+              >
+                <TrendingUp className="w-4 h-4 mr-1 lg:mr-2" />
+                Inflation SWP
+              </TabsTrigger>
+              <TabsTrigger
+                value="delay-cost"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 text-sm font-semibold transition-all"
+              >
+                <Calculator className="w-4 h-4 mr-1 lg:mr-2" />
+                Delay Cost
+              </TabsTrigger>
+              <TabsTrigger
+                value="reverse"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 text-sm font-semibold transition-all"
+              >
+                <Target className="w-4 h-4 mr-1 lg:mr-2" />
+                Reverse
+              </TabsTrigger>
+              <TabsTrigger
+                value="balancer"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-xl py-3 text-sm font-semibold transition-all"
+              >
+                <Calculator className="w-4 h-4 mr-1 lg:mr-2" />
+                SIP-Lumpsum
               </TabsTrigger>
             </TabsList>
 
@@ -1235,6 +1385,443 @@ const Calculators = () => {
                         <div className="flex justify-between items-center pt-2">
                           <span className="text-lg font-semibold">Remaining Corpus</span>
                           <span className="text-3xl font-bold text-primary">{formatCurrency(swpResult.remainingCorpus)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Inflation-Adjusted SWP Calculator */}
+            <TabsContent value="inflation-swp" className="mt-8">
+              <Card className="border-0 shadow-2xl rounded-3xl overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-accent to-primary text-primary-foreground p-8">
+                  <CardTitle className="text-3xl">Inflation-Adjusted SWP Calculator</CardTitle>
+                  <CardDescription className="text-primary-foreground/90 text-base">
+                    Calculate sustainable withdrawals with annual inflation adjustments
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="inflationSwpCorpus" className="text-base font-semibold mb-3 block">
+                          Total Investment Corpus (₹)
+                        </Label>
+                        <Input
+                          id="inflationSwpCorpus"
+                          type="number"
+                          value={inflationSwpCorpus}
+                          onChange={(e) => setInflationSwpCorpus(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="inflationSwpWithdrawal" className="text-base font-semibold mb-3 block">
+                          Initial Monthly Withdrawal (₹)
+                        </Label>
+                        <Input
+                          id="inflationSwpWithdrawal"
+                          type="number"
+                          value={inflationSwpWithdrawal}
+                          onChange={(e) => setInflationSwpWithdrawal(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="inflationSwpRate" className="text-base font-semibold mb-3 block">
+                          Expected Annual Return (%)
+                        </Label>
+                        <Input
+                          id="inflationSwpRate"
+                          type="number"
+                          value={inflationSwpRate}
+                          onChange={(e) => setInflationSwpRate(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="inflationSwpInflation" className="text-base font-semibold mb-3 block">
+                          Expected Inflation Rate (%)
+                        </Label>
+                        <Input
+                          id="inflationSwpInflation"
+                          type="number"
+                          value={inflationSwpInflation}
+                          onChange={(e) => setInflationSwpInflation(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="inflationSwpYears" className="text-base font-semibold mb-3 block">
+                          Withdrawal Period (Years)
+                        </Label>
+                        <Input
+                          id="inflationSwpYears"
+                          type="number"
+                          value={inflationSwpYears}
+                          onChange={(e) => setInflationSwpYears(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-accent/5 to-primary/5 rounded-2xl p-8 space-y-6">
+                      <h3 className="text-2xl font-bold mb-6">Inflation-Adjusted Summary</h3>
+                      
+                      <div className="h-64 mb-6">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={[
+                                { name: "Withdrawn", value: inflationSwpResult.totalWithdrawn },
+                                { name: "Remaining", value: inflationSwpResult.remainingCorpus }
+                              ]}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={90}
+                              paddingAngle={2}
+                              dataKey="value"
+                            >
+                              <Cell fill="hsl(var(--primary) / 0.3)" />
+                              <Cell fill="hsl(var(--primary))" />
+                            </Pie>
+                            <Legend 
+                              verticalAlign="top" 
+                              height={36}
+                              formatter={(value) => <span className="text-sm">{value}</span>}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Initial Corpus</span>
+                          <span className="text-xl font-bold">{formatCurrency(inflationSwpResult.initialCorpus)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Total Withdrawn</span>
+                          <span className="text-xl font-bold text-green-600">{formatCurrency(inflationSwpResult.totalWithdrawn)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Final Monthly Withdrawal</span>
+                          <span className="text-xl font-bold text-blue-600">{formatCurrency(inflationSwpResult.finalWithdrawal)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-2">
+                          <span className="text-lg font-semibold">Remaining Corpus</span>
+                          <span className="text-3xl font-bold text-primary">{formatCurrency(inflationSwpResult.remainingCorpus)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Delay Cost Calculator */}
+            <TabsContent value="delay-cost" className="mt-8">
+              <Card className="border-0 shadow-2xl rounded-3xl overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-primary to-accent text-primary-foreground p-8">
+                  <CardTitle className="text-3xl">Delay Cost Calculator</CardTitle>
+                  <CardDescription className="text-primary-foreground/90 text-base">
+                    Understand the cost of delaying your investment
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="delayTargetAmount" className="text-base font-semibold mb-3 block">
+                          Target Amount (₹)
+                        </Label>
+                        <Input
+                          id="delayTargetAmount"
+                          type="number"
+                          value={delayTargetAmount}
+                          onChange={(e) => setDelayTargetAmount(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="delayYearsPlanned" className="text-base font-semibold mb-3 block">
+                          Originally Planned Period (Years)
+                        </Label>
+                        <Input
+                          id="delayYearsPlanned"
+                          type="number"
+                          value={delayYearsPlanned}
+                          onChange={(e) => setDelayYearsPlanned(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="delayYearsDelayed" className="text-base font-semibold mb-3 block">
+                          Years Delayed
+                        </Label>
+                        <Input
+                          id="delayYearsDelayed"
+                          type="number"
+                          value={delayYearsDelayed}
+                          onChange={(e) => setDelayYearsDelayed(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="delayRate" className="text-base font-semibold mb-3 block">
+                          Expected Return (%)
+                        </Label>
+                        <Input
+                          id="delayRate"
+                          type="number"
+                          value={delayRate}
+                          onChange={(e) => setDelayRate(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl p-8 space-y-6">
+                      <h3 className="text-2xl font-bold mb-6">Delay Impact</h3>
+                      
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Original Monthly SIP</span>
+                          <span className="text-xl font-bold">{formatCurrency(delayCostResult.monthlySIPPlanned)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">New Monthly SIP Required</span>
+                          <span className="text-xl font-bold text-red-600">{formatCurrency(delayCostResult.monthlySIPDelayed)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Extra Monthly Investment</span>
+                          <span className="text-xl font-bold text-red-600">+{formatCurrency(delayCostResult.delayCost)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-2">
+                          <span className="text-lg font-semibold">Percentage Increase</span>
+                          <span className="text-3xl font-bold text-red-600">+{delayCostResult.percentageIncrease}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Reverse Calculator */}
+            <TabsContent value="reverse" className="mt-8">
+              <Card className="border-0 shadow-2xl rounded-3xl overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-accent to-primary text-primary-foreground p-8">
+                  <CardTitle className="text-3xl">Reverse SIP Calculator</CardTitle>
+                  <CardDescription className="text-primary-foreground/90 text-base">
+                    Find out how much to invest monthly to reach your target
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="reverseTargetAmount" className="text-base font-semibold mb-3 block">
+                          Target Amount (₹)
+                        </Label>
+                        <Input
+                          id="reverseTargetAmount"
+                          type="number"
+                          value={reverseTargetAmount}
+                          onChange={(e) => setReverseTargetAmount(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="reverseYears" className="text-base font-semibold mb-3 block">
+                          Investment Period (Years)
+                        </Label>
+                        <Input
+                          id="reverseYears"
+                          type="number"
+                          value={reverseYears}
+                          onChange={(e) => setReverseYears(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="reverseRate" className="text-base font-semibold mb-3 block">
+                          Expected Return (%)
+                        </Label>
+                        <Input
+                          id="reverseRate"
+                          type="number"
+                          value={reverseRate}
+                          onChange={(e) => setReverseRate(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-accent/5 to-primary/5 rounded-2xl p-8 space-y-6">
+                      <h3 className="text-2xl font-bold mb-6">Required Investment</h3>
+                      
+                      <div className="h-64 mb-6">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={[
+                                { name: "Investment", value: reverseResult.totalInvestment },
+                                { name: "Returns", value: reverseResult.returns }
+                              ]}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={90}
+                              paddingAngle={2}
+                              dataKey="value"
+                            >
+                              <Cell fill="hsl(var(--primary) / 0.3)" />
+                              <Cell fill="hsl(var(--primary))" />
+                            </Pie>
+                            <Legend 
+                              verticalAlign="top" 
+                              height={36}
+                              formatter={(value) => <span className="text-sm">{value}</span>}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Required Monthly SIP</span>
+                          <span className="text-xl font-bold text-blue-600">{formatCurrency(reverseResult.monthlySIP)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Total Investment</span>
+                          <span className="text-xl font-bold">{formatCurrency(reverseResult.totalInvestment)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Expected Returns</span>
+                          <span className="text-xl font-bold text-green-600">{formatCurrency(reverseResult.returns)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-2">
+                          <span className="text-lg font-semibold">Target Amount</span>
+                          <span className="text-3xl font-bold text-primary">{formatCurrency(reverseResult.targetAmount)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* SIP-Lumpsum Balancer */}
+            <TabsContent value="balancer" className="mt-8">
+              <Card className="border-0 shadow-2xl rounded-3xl overflow-hidden">
+                <CardHeader className="bg-gradient-to-r from-primary to-accent text-primary-foreground p-8">
+                  <CardTitle className="text-3xl">SIP-Lumpsum Balancer</CardTitle>
+                  <CardDescription className="text-primary-foreground/90 text-base">
+                    Balance your lumpsum investment with required monthly SIP
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="p-8">
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <div>
+                        <Label htmlFor="balancerTargetAmount" className="text-base font-semibold mb-3 block">
+                          Target Amount (₹)
+                        </Label>
+                        <Input
+                          id="balancerTargetAmount"
+                          type="number"
+                          value={balancerTargetAmount}
+                          onChange={(e) => setBalancerTargetAmount(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="balancerLumpsumAmount" className="text-base font-semibold mb-3 block">
+                          Available Lumpsum Amount (₹)
+                        </Label>
+                        <Input
+                          id="balancerLumpsumAmount"
+                          type="number"
+                          value={balancerLumpsumAmount}
+                          onChange={(e) => setBalancerLumpsumAmount(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="balancerYears" className="text-base font-semibold mb-3 block">
+                          Investment Period (Years)
+                        </Label>
+                        <Input
+                          id="balancerYears"
+                          type="number"
+                          value={balancerYears}
+                          onChange={(e) => setBalancerYears(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="balancerRate" className="text-base font-semibold mb-3 block">
+                          Expected Return (%)
+                        </Label>
+                        <Input
+                          id="balancerRate"
+                          type="number"
+                          value={balancerRate}
+                          onChange={(e) => setBalancerRate(Number(e.target.value))}
+                          className="h-12 text-lg rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl p-8 space-y-6">
+                      <h3 className="text-2xl font-bold mb-6">Balanced Strategy</h3>
+                      
+                      <div className="h-64 mb-6">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={[
+                                { name: "Lumpsum Growth", value: balancerResult.lumpsumGrowth },
+                                { name: "SIP Investment", value: balancerResult.totalSIPInvestment }
+                              ]}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={90}
+                              paddingAngle={2}
+                              dataKey="value"
+                            >
+                              <Cell fill="hsl(var(--accent))" />
+                              <Cell fill="hsl(var(--primary))" />
+                            </Pie>
+                            <Legend 
+                              verticalAlign="top" 
+                              height={36}
+                              formatter={(value) => <span className="text-sm">{value}</span>}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Lumpsum Growth</span>
+                          <span className="text-xl font-bold text-accent">{formatCurrency(balancerResult.lumpsumGrowth)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Required Monthly SIP</span>
+                          <span className="text-xl font-bold text-blue-600">{formatCurrency(balancerResult.monthlySIP)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pb-4 border-b border-border">
+                          <span className="text-muted-foreground">Total SIP Investment</span>
+                          <span className="text-xl font-bold">{formatCurrency(balancerResult.totalSIPInvestment)}</span>
+                        </div>
+                        <div className="flex justify-between items-center pt-2">
+                          <span className="text-lg font-semibold">Target Amount</span>
+                          <span className="text-3xl font-bold text-primary">{formatCurrency(balancerResult.targetAmount)}</span>
                         </div>
                       </div>
                     </div>

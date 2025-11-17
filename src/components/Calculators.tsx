@@ -370,8 +370,13 @@ const Calculators = () => {
 
         <div className="max-w-5xl mx-auto">
           <Tabs defaultValue="sip" className="w-full">
-           <TabsList className="grid w-full grid-cols-6 lg:grid-cols-7 h-auto p-2 bg-card rounded-2xl shadow-lg gap-2 justify-items-center">
-
+          <TabsList className="
+  grid w-full 
+  grid-cols-3 lg:grid-cols-7 
+  h-auto p-2 
+  bg-card rounded-2xl shadow-lg 
+  gap-4 justify-items-center
+">
 
 
               <TabsTrigger
